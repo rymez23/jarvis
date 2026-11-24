@@ -113,3 +113,19 @@ def test_remember_adds_quick_answers_to_history(server):
     b = Brain("m", "p", server)
     b.remember("what time is it", "It's 9:00 PM.")
     assert [m["content"] for m in b.history] == ["what time is it", "It's 9:00 PM."]
+
+
+def test_context_is_added_to_every_request(server):
+    clock = iter(["It is Monday.", "It is Tuesday."])
+    b = Brain("m", "be Jarvis", server, context=lambda: next(clock))
+    b.ask("one")
+    assert FakeOllama.received[-1]["messages"][0]["content"] == "be Jarvis\n\nIt is Monday."
+    b.ask("two")
+    assert FakeOllama.received[-1]["messages"][0]["content"] == "be Jarvis\n\nIt is Tuesday."   # refreshed each time
+
+
+def test_now_context_has_real_date():
+    from datetime import datetime
+    from jarvis.main import now_context
+    text = now_context()
+    assert datetime.now().strftime("%A") in text and str(datetime.now().year) in text

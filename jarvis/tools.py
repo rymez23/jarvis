@@ -175,7 +175,8 @@ class Actions:
         t = text.lower().strip(" ?.!")
         if re.search(r"\bwhat(?:'s| is)? the time\b|\bwhat time is it\b|\bgot the time\b", t):
             return self.get_time()
-        if re.search(r"\bwhat(?:'s| is)? (?:the |today'?s )?date\b|\bwhat day is (?:it|today)\b", t):
+        if re.search(r"\b(?:what|which)(?:'s| is)? (?:the |today'?s )?date\b|\b(?:what|which) day is (?:it|today)\b"
+                     r"|\bday of the week\b|\bwhat(?:'s| is) today\b", t):
             return self.get_date()
         if re.search(r"\bbrief(?:ing)?\b", t):
             return self.read_morning_brief()

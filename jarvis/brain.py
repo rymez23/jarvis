@@ -35,7 +35,7 @@ class Reply:
 
 class Brain:
     def __init__(self, model: str, personality: str, url: str = "http://127.0.0.1:11434",
-                 max_history: int = 10, think: bool = False, timeout: float = 300):
+                 max_history: int = 10, think: bool = False, timeout: float = 300, context=None):
         self.model = model
         self.personality = personality
         self.url = url.rstrip("/")
@@ -43,6 +43,10 @@ class Brain:
         self.think = think        # "thinking" models reason before answering: smarter but much slower on CPU
         self.timeout = timeout
         self.history: list[dict] = []
+        # context: an optional function returning up-to-date facts (like the current
+        # date and time) that are added to the instructions on EVERY request. The model
+        # has no clock; without this it guesses, and guesses wrong.
+        self.context = context
 
     # ------------------------------------------------------------------ talking to Ollama
 
@@ -95,7 +99,7 @@ class Brain:
     def _chat(self, tools: list | None) -> dict:
         payload = {
             "model": self.model,
-            "messages": [{"role": "system", "content": self.personality}] + self.history,
+            "messages": [{"role": "system", "content": self.system_prompt()}] + self.history,
             "stream": False,       # wait for the whole answer
             "think": self.think,
             "keep_alive": "30m",   # keep the model loaded in RAM for 30 min so the next answer is quicker
@@ -103,6 +107,10 @@ class Brain:
         if tools:
             payload["tools"] = tools
         return self._post("/api/chat", payload)
+
+    def system_prompt(self) -> str:
+        extra = self.context() if self.context else ""
+        return f"{self.personality}\n\n{extra}".strip()
 
     @staticmethod
     def _timings(data: dict) -> tuple[int, float, float]:

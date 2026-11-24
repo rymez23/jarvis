@@ -29,6 +29,13 @@ from . import voice as voice_mod
 ROOT = Path(__file__).resolve().parent.parent
 
 
+def now_context() -> str:
+    """Facts the model can't know by itself, refreshed for every message."""
+    from datetime import datetime
+    now = datetime.now()
+    return f"Right now it is {now.strftime('%A, %B')} {now.day}, {now.year}, {now.strftime('%I:%M %p').lstrip('0')} local time."
+
+
 def load_settings() -> dict:
     return json.loads((ROOT / "settings.json").read_text(encoding="utf-8"))
 
@@ -228,7 +235,7 @@ def main(argv=None) -> int:
             v.say(args.say)
         return 0
     brain = Brain(args.model or settings["model"], settings["personality"], settings["ollama_url"],
-                  settings.get("max_history", 10), settings.get("think", False))
+                  settings.get("max_history", 10), settings.get("think", False), context=now_context)
     if not brain.is_running():
         print("Ollama isn't running. Open the Ollama app from the Start menu, then try again.")
         return 1

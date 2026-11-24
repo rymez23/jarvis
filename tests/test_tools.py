@@ -83,6 +83,9 @@ def test_quiet_brief_and_missing_brief(tmp_path):
 @pytest.mark.parametrize("said, expected", [
     ("What time is it?", "It's 5:30 AM."),
     ("Jarvis, what's the date", "Today is Tuesday, November 24th."),
+    ("Can you tell me what day of the week it is today?", "Today is Tuesday, November 24th."),
+    ("Which day is it", "Today is Tuesday, November 24th."),
+    ("What's today?", "Today is Tuesday, November 24th."),
     ("Open VS Code", "Opening vs code."),
     ("Could you launch the browser", "Opening chrome."),
     ("Any updates on my computer?", "Chrome update available"),
@@ -92,7 +95,8 @@ def test_quick_match(actions, said, expected):
     assert actions.quick_match(said).startswith(expected)
 
 
-@pytest.mark.parametrize("said", ["Tell me a joke", "Open your heart to me", "Start my day right"])
+@pytest.mark.parametrize("said", ["Tell me a joke", "Open your heart to me", "Start my day right",
+                                  "Which day is my shift this week?"])
 def test_everything_else_goes_to_the_model(actions, said):
     assert actions.quick_match(said) is None
     assert actions.opened == []
