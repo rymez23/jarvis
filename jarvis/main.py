@@ -7,6 +7,7 @@ Talk to Jarvis. Press Enter and speak, or type; he answers out loud.
     jarvis --voices           hear every downloaded voice, to choose one
     jarvis --say "Hello"      just say something (handy for testing a voice)
     jarvis --hear             record once and show what Jarvis heard (mic test)
+    jarvis --wake             hands-free: say "Hey Jarvis", wait for the beep, then speak
 
 In the chat:  press Enter on an empty line to speak; say "goodbye Jarvis" to exit.
               /mute toggles speech,  /reset forgets the conversation,
@@ -168,6 +169,33 @@ def bench(settings: dict) -> None:
         print(f"  {model:20} {avg:5.1f} tokens/s   first load {load:5.1f}s   all 3 answers {total:5.1f}s")
 
 
+def hands_free(brain: Brain, voice, ears, actions: Actions | None, wake) -> None:
+    """Loop forever: wait for "Hey Jarvis", beep, listen, answer out loud.
+    Say "goodbye Jarvis" (after waking him) or press Ctrl+C to stop."""
+    from .wake import beep
+    print('Hands-free mode. Say "Hey Jarvis", wait for the beep, then speak. Ctrl+C to stop.\n')
+    try:
+        while True:
+            print("  (waiting for 'Hey Jarvis')", flush=True)
+            wake.wait_for_mic()
+            beep()
+            text = ears.listen(on_start=lambda: print("  Listening...", flush=True))
+            if not text:
+                print("  (didn't catch that)\n")
+                continue
+            print(f"  You said: {text}")
+            if text.lower().strip(" .!") in GOODBYES:
+                if voice:
+                    voice.say("Very good. Goodbye, PJ.")
+                break
+            reply = respond(brain, actions, text)
+            print(f"Jarvis: {reply.text}\n")
+            if voice:
+                voice.say(reply.text)
+    except KeyboardInterrupt:
+        print("\nStopped.")
+
+
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description="Jarvis, your offline assistant (text mode).")
     p.add_argument("--model", help="use this model instead of the one in settings.json")
@@ -175,6 +203,7 @@ def main(argv=None) -> int:
     p.add_argument("--voices", action="store_true", help="hear each downloaded voice")
     p.add_argument("--say", metavar="TEXT", help="speak TEXT with the current voice and exit")
     p.add_argument("--hear", action="store_true", help="record once and print what was heard")
+    p.add_argument("--wake", action="store_true", help='hands-free mode: say "Hey Jarvis" to talk')
     args = p.parse_args(argv)
 
     settings = load_settings()
@@ -207,7 +236,20 @@ def main(argv=None) -> int:
         bench(settings)
     else:
         actions = Actions() if settings.get("actions", True) else None
-        chat(brain, load_voice(settings), load_ears(settings), actions)
+        voice, ears = load_voice(settings), load_ears(settings)
+        if args.wake:
+            if not ears:
+                print("Hands-free mode needs the microphone (ears) working.")
+                return 1
+            try:
+                from .wake import WakeWord
+                wake = WakeWord(settings.get("wake", {}).get("threshold", 0.5))
+            except ImportError:
+                print("Hands-free mode needs openwakeword. Use the 'jarvis' command.")
+                return 1
+            hands_free(brain, voice, ears, actions, wake)
+        else:
+            chat(brain, voice, ears, actions)
     return 0
 
 

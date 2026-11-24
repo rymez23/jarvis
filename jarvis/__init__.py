@@ -6,5 +6,5 @@ Parts (each is one file, so any part can be swapped without touching the others)
     ears.py    hearing    - faster-whisper speech-to-text                (stage 3, done)
     tools.py   actions    - time, open apps, read the morning brief      (stage 4, done)
     brief_reader.py            reads the morning brief's saved page for tools.py
-    wake.py    wake word  - "Jarvis..."                                  (stage 5)
+    wake.py    wake word  - "Hey Jarvis" with openWakeWord             (stage 5, done)
 """

@@ -11,6 +11,7 @@ Everything runs on this PC through Ollama; nothing goes to the internet.
     jarvis --voices            hear every downloaded voice
     jarvis --say "Hello"       speak a line with the current voice
     jarvis --hear              mic test: record once and show what was heard
+    jarvis --wake              hands-free: say "Hey Jarvis", wait for the beep, then speak
 
 In chat: press **Enter on an empty line and speak** (it stops when you go quiet), or type.
 Say "goodbye Jarvis" to exit. `/mute` toggles speech, `/stats` shows speed, `/reset` forgets the conversation, `/quit` exits.
@@ -37,6 +38,7 @@ of `jarvis/tools.py`.
 - `voice`: `name` (a downloaded Piper voice), `speed` (1.0 normal, 0.9 faster), `enabled`
 - `ears`: `model` (Whisper model; `base.en` is downloaded), `enabled`
 - `actions`: `true` lets Jarvis use the actions above
+- `wake`: `threshold` for "Hey Jarvis" (0.3 wakes easily, 0.7 needs a clear call)
 
 ## Where things live
 
@@ -58,6 +60,6 @@ The `jarvis` command uses the Python 3.13 environment. To add a package to it:
 2. Voice out: Piper text-to-speech. **Done.**
 3. Voice in: push-to-talk with faster-whisper. **Done.**
 4. Actions: time, open apps, read the morning brief aloud. **Done.**
-5. Wake word: "Jarvis..."
+5. Wake word: "Hey Jarvis" with openWakeWord. **Done.**
 
 Stages 2+ need Python 3.13 in a virtual environment (voice libraries lag behind 3.15).

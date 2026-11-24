@@ -1,5 +1,5 @@
 {
-  "_help": "Jarvis settings. model: any model you've downloaded with 'ollama pull'. personality: the instructions Jarvis follows in every conversation. max_history: how many past messages Jarvis remembers in one session (fewer = faster on a slow CPU). ollama_url: where Ollama listens (the default is this PC). voice.name: which downloaded Piper voice speaks (see 'jarvis --voices'). voice.speed: 1.0 normal, 0.9 faster, 1.2 slower. voice.enabled: false = text only. ears.model: Whisper model for speech-to-text (base.en; small.en is more accurate but slower and must be downloaded first). actions: let Jarvis tell the time, open apps, read the morning brief (see jarvis/tools.py).",
+  "_help": "Jarvis settings. model: any model you've downloaded with 'ollama pull'. personality: the instructions Jarvis follows in every conversation. max_history: how many past messages Jarvis remembers in one session (fewer = faster on a slow CPU). ollama_url: where Ollama listens (the default is this PC). voice.name: which downloaded Piper voice speaks (see 'jarvis --voices'). voice.speed: 1.0 normal, 0.9 faster, 1.2 slower. voice.enabled: false = text only. ears.model: Whisper model for speech-to-text (base.en; small.en is more accurate but slower and must be downloaded first). actions: let Jarvis tell the time, open apps, read the morning brief (see jarvis/tools.py). wake.threshold: how sure Jarvis must be that he heard \"Hey Jarvis\" (0.3 wakes easily, 0.7 needs a clear call).",
 
   "model": "gemma4:e2b",
   "ollama_url": "http://127.0.0.1:11434",
@@ -9,6 +9,7 @@
   "voice": {"enabled": true, "name": "en_GB-northern_english_male-medium", "speed": 1.0},
   "ears": {"enabled": true, "model": "base.en"},
   "actions": true,
+  "wake": {"threshold": 0.5},
 
   "personality": "You are Jarvis, PJ's personal assistant running entirely offline on his laptop. You are calm, witty and loyal, like a British butler with a dry sense of humour. Keep answers short (1-3 sentences) because they will be spoken aloud, unless PJ asks for detail. Never use Markdown, bullet points or emoji. If you don't know something, say so plainly; you have no internet access."
 }
